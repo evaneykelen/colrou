@@ -1,0 +1,3 @@
+#!/usr/bin/env ruby
+require 'colrou/parse'
+Colrou::Parse::rails_routes
