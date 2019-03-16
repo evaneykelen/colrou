@@ -1,17 +1,20 @@
 module Colrou
   class Parse
-    def self.rails_routes(argf)
-      if 0 == argf.length
-        puts %{Reformats output of `rails routes`:
+    def self.rails_routes
+      if ARGF.filename != "-" or (not STDIN.tty? and not STDIN.closed?)
+        RailsRoutesParser.parse
+     else
+        puts %{
+Reformats output of `rails routes`:
 - HTTP verbs and path parameters are colorized
 - Line breaks are inserted between controllers
 
 Usage examples:
 
 $ rails routes | colrou
-$ rails routes -g posts | colrou}
-      else
-        RailsRoutesParser.parse(argf)
+$ rails routes -g posts | colrou
+
+}
       end
     end
   end
@@ -53,10 +56,10 @@ $ rails routes -g posts | colrou}
       controller_action.split("#")[0]      # Get "controller" from "controller#action"
     end
 
-    def self.parse(argf)
+    def self.parse
       prev_controller_name = nil
       begin
-        while input = argf.gets
+        while input = ARGF.gets
           input.each_line do |line|
             begin
               # Apply colorizations
