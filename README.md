@@ -1,10 +1,8 @@
 # Colrou
 
-Colrou is a portmanteau of "colorized routes".
+Colrou reformats output of `rails routes`. The name is a portmanteau of "colorized routes".
 
-It reformats output of `rails routes`:
-
-Example:
+### Example
 
 ![Example](https://user-images.githubusercontent.com/11846/54473866-ccc02600-47dd-11e9-9093-8ba1d9fe7d44.png)
 
