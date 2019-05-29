@@ -1,3 +1,6 @@
+![Gem Version](https://img.shields.io/gem/v/colrou.svg) ![License](https://img.shields.io/github/license/evaneykelen/colrou.svg)
+![Last Commit](https://img.shields.io/github/last-commit/evaneykelen/colrou.svg)
+
 # Colrou
 
 Colrou reformats output of `rails routes`. The name is a portmanteau of "colorized routes".
