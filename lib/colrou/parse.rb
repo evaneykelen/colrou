@@ -1,3 +1,5 @@
+require 'yaml'
+
 module Colrou
   class Parse
     def self.rails_routes
@@ -27,26 +29,30 @@ $ rails routes -g posts | colrou
     CYAN        = "\e[96m"
     RESET_COLOR = "\e[0m"
 
-    VERBS_AND_COLORS = [
-      { verb: "DELETE", color: RED    },
-      { verb: "GET",    color: GREEN  },
-      { verb: "PATCH",  color: PURPLE },
-      { verb: "POST",   color: YELLOW },
-      { verb: "PUT",    color: PURPLE }
-    ]
+    COLORS = {
+      http_verb_colors: {
+        delete: RED,
+        get: GREEN,
+        patch: PURPLE,
+        post: YELLOW,
+        put: PURPLE
+      },
+      misc_colors: {
+        reset: RESET_COLOR,
+        param: CYAN
+      }
+    }
 
     def self.colorize_verbs(line)
-      VERBS_AND_COLORS.each do |verb_and_color|
-        verb = verb_and_color[:verb]
-        color = verb_and_color[:color]
-        line.gsub!(/#{verb}/, "#{color}#{verb}#{RESET_COLOR}")
+      COLORS[:http_verb_colors].each do |verb, color|
+        line.gsub!(/#{verb.upcase}/, "#{color}#{verb.upcase}#{COLORS[:misc_colors][:reset]}")
       end
     end
 
     # Uses https://ruby-doc.org/core-1.9.3/Regexp.html#class-Regexp-label-Capturing
     def self.colorize_parameters(line)
       line.gsub!(/(?<parameter>\/:\w+)/) do
-        "/#{CYAN}#{$~[:parameter].slice(1..-1)}#{RESET_COLOR}"
+        "/#{COLORS[:misc_colors][:param]}#{$~[:parameter].slice(1..-1)}#{COLORS[:misc_colors][:reset]}"
       end
     end
 
@@ -56,7 +62,20 @@ $ rails routes -g posts | colrou
       controller_action.split("#")[0]      # Get "controller" from "controller#action"
     end
 
+    def self.prepare_colors
+      config_file = File.join(Dir.home, ".colrou.yml")
+      return unless File.file?(config_file)
+      config = YAML.load_file(File.join(Dir.home, ".colrou.yml"))
+      config["http_verb_colors"].each do |verb, color|
+        COLORS[:http_verb_colors][verb.to_sym] = color
+      end
+      config["misc_colors"].each do |attrib, color|
+        COLORS[:misc_colors][attrib.to_sym] = color
+      end
+    end
+
     def self.parse
+      prepare_colors
       prev_controller_name = nil
       begin
         while input = ARGF.gets
@@ -77,7 +96,7 @@ $ rails routes -g posts | colrou
           end
         end
       rescue
-        puts "Invalid input"
+        puts "Invalid input (#{$!})"
       end
     end
   end
